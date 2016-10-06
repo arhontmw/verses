@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+
+
+{% block title %}Данные аккаунта изменены{% endblock %}
+
+{% block first %}
+    <div id="authorization" class="text-center">
+      <h2><strong>Данные аккаунта успешно изменены</strong></h2>
+      <br>
+      <p>
+        <a href="{% url 'user:render_main' %}" class="menu-link">На главную</a> |
+        <a href="{% url 'user:user_page' request.session.user_id %}" class="menu-link">В мой кабинет</a>
+      </p>
+    </div>
+
+
+
+{% endblock %}

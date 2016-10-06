@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}//Verses.{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      {% block secondary %}
+        <div class="jumbotron" id="main-page">
+          {% block first %}
+            <h1 class="text-center">//Verses.</h1>
+            <p class="text-center">
+              Сайт с нероссийским названием о российских поэтах и их творчестве
+            </p>
+            <br>
+            <p class="text-center">
+              <a class="btn btn-default btn-lg" href="{% url 'verse:verse_list' %}" role="button">
+                Читать стихи
+              </a>
+            </p>
+          {% endblock %} <!-- end first -->
+      </div>
+    {% endblock %}  <!-- end secondary -->
+    </div><!--End col-md-12 -->
+  </div><!--End row-->
+{% endblock %}

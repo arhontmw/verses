@@ -1,0 +1,145 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Главная страница{% endblock %}</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  </head>
+  <body>
+    <div id="wrapper">
+      <!-- Navbar -->
+      <div class="row">
+        <div class="col-md-12">
+          <nav class="navbar navbar-default">
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                  data-target = "#bs-example-navbar-collapse-1" aria-expanded="false">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <strong><a href="{% url 'user:render_main' %}" class="navbar-brand">//</a></strong>
+              </div>
+              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                  <li{% if section == "main_page" %} class="active"{% endif %}>
+                    <a href="{% url 'user:render_main' %}">
+                      <strong>
+                        <span class="glyphicon glyphicon-home"></span> Главная
+                      </strong>
+                    </a>
+                  </li>
+                  <li{% if section == "verse_list" %} class="active"{% endif %}>
+                    <a href="{% url 'verse:verse_list' %}">
+                      <strong>
+                        <span class="glyphicon glyphicon-list"></span> Все стихи
+                      </strong>
+                    </a>
+                  </li>
+                  <li class="dropdown {% if section == 'verse_list_by_author' %}active{% endif %}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                      aria-haspopup="true" aria-expanded="false">
+                      <strong>
+                        Стихи по авторам <span class="caret"></span>
+                      </strong>
+                    </a>
+                    <ul class="dropdown-menu">
+                      {% for a in authors %}
+                        <li>
+                          <a href="{% url 'verse:verse_list_by_author' a.slug %}">
+                            {{ a }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </li><!--End Стихи -->
+                  <li class="dropdown {% if section == 'author_list' %}active{% endif %}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                      aria-haspopup="true" aria-expanded="false">
+                      <strong>
+                        О поэтах <span class="caret"></span>
+                      </strong>
+                    </a>
+                    <ul class="dropdown-menu">
+                      {% for a in authors %}
+                        <li>
+                          <a href="{% url 'author:author_detail' a.id a.slug %}">
+                            {{ a }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </li><!-- End О Поэтах -->
+                </ul><!-- end navbar=nav-->
+
+                {% with request.session.username as name %}
+                  {% if name %}
+                    <ul class="nav navbar-nav navbar-right">
+                      {% if request.session.user_is_staff %}
+                        <li>
+                          <a href="/admin/">
+                            <strong><span class="glyphicon glyphicon-king"></span> Администрирование</strong>
+                          </a>
+                        </li>
+                      {% endif %}
+                      <li{% if section == 'user_page' %} class="active"{% endif %}>
+                        <a href="{% url 'user:user_page' request.session.user_id %}">
+                          <strong><span class="glyphicon glyphicon-user"></span> {{ name }}</strong>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'user:logout' %}"><strong><span class="glyphicon glyphicon-log-out"></span> Выйти</strong></a>
+                      </li>
+                    </ul>
+                  {% else %}
+                      <ul class="nav navbar-nav navbar-right">
+                        <li>
+                          <a href="{% url 'user:login' %}"><span class="glyphicon glyphicon-log-in"></span> <strong> Войти</strong></a>
+                        </li>
+                        <li{% if section == 'registration' %} class="active"{% endif %}>
+                          <a href="{% url 'user:register' %}"><strong>Регистрация</strong></a>
+                        </li>
+                      </ul>
+                  {% endif %}
+                {% endwith %}
+
+              </div>
+            </div>
+          </nav> <!-- End Navbar -->
+        </div><!-- End col-md-12-->
+      </div><!--end row-->
+
+      <div id="content">
+        <div class="row">
+          <div class="col-md-12">
+            {% if messages %}
+              {% for message in messages %}
+                {% with message.tags as tag %}
+                  <div class="alert alert-{% if tag == 'error' %}danger{% elif tag == 'debug' %}info{% else %}{{ tag }}{% endif %} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong class="text-uppercase">{{ message.tags }}</strong> | {{ message|safe }}
+                  </div>
+                {% endwith %}
+              {% endfor %}
+            {% endif %}
+          </div><!--end col-md-12-->
+        </div><!--end row-->
+
+        {% block content %}
+        {% endblock %}
+      </div>
+
+    </div> <!-- end wrapper -->
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    {% block scripts %}
+    {% endblock %}
+  </body>
+</html>

@@ -1,0 +1,58 @@
+{% extends "main.html" %}
+
+
+{% block title %}Страница авторизации{% endblock %}
+
+<!-- write jquery listener on field status -->
+
+{% block first %}
+    <div id="authorization" class="text-center">
+      <h2><strong>Авторизация</strong></h2>
+      {% if auth_status == "invalid" %}
+        <p style="color: #E74C3C">
+          <small>Введён некорретный логин или пароль</small>
+        </p>
+      {% elif auth_status == "disabled" %}
+        <p>
+          <small>Данный пользователь удалён из системы</small>
+        </p>
+      {% else %}
+        <p>
+          <small>Пожалуйста, введите данные Вашего аккаунта</small>
+        </p>
+      {% endif %}
+
+      {% if field.errors %}
+        <p>
+          Выявлены ошибки
+        </p>
+      {% endif %}
+      <br>
+      <form action="." method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="form-group col-md-4 col-md-offset-4{% if auth_status == 'invalid' %} has-error{% endif %}">
+              <label for="username">Логин или e-mail</label>
+              <input type="text" class="form-control text-center" id="id_username" placeholder="Введите логин или email" name="username" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-4 col-md-offset-4{% if auth_status == 'invalid' %} has-error{% endif %}">
+              <label for="password">Пароль</label>
+              <input type="password" class="form-control text-center" id="id_password" placeholder="Пароль" name="password" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="checkbox">
+            <label>
+                <input type="checkbox" name="rememberme">Запомнить меня
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-default">&nbsp;&nbsp;&nbsp;Войти&nbsp;&nbsp;&nbsp;</button>
+      </form>
+    </div>
+
+
+
+{% endblock %}

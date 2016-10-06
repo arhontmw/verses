@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+
+
+{% block title %}Выход{% endblock %}
+
+{% block first %}
+    <div id="authorization" class="text-center">
+      <h2><strong>Вы вышли из аккаунта</strong></h2>
+      <br>
+      <p>
+        <a href="{% url 'user:login' %}" class="menu-link"><span class="glyphicon glyphicon-log-in"></span> Войти в аккаунт</a>
+        &emsp;
+        <a href="{% url 'user:render_main' %}" class="menu-link"><span class="glyphicon glyphicon-home"></span> На главную</a>
+      </p>
+    </div>
+
+
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "main.html" %}
+
+{% block title %}Редактирование данных аккаунта{% endblock %}
+
+<!-- write jquery listener on field status -->
+
+{% block first %}
+    <div id="registration">
+      <h2><strong>Редактирование аккаунта</strong></h2>
+      <br>
+      <form action="." method="post" enctype="multipart/form-data" class="form-horizontal">
+        {% for field in user_form %}
+            <div class="row">
+              <div class="form-group {% if field.errors %}has-error{% endif %}">
+                {% with field.name as name %}
+                  <label for="{{ name }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                  <div class="col-sm-3">
+                  <input type="text" class="form-control" id="{{ field.id_for_label }}" name="{{ name }}" value="{{ field.value }}"/>
+                  {% for error in field.errors %}
+                    <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                  </div>
+                {% endwith %}
+              </div>
+            </div>
+        {% endfor %}
+        {% for field in profile_form %}
+            <div class="row">
+              <div class="form-group {% if field.errors %}has-error{% endif %}">
+                {% with field.name as name %}
+                  <label for="{{ name }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                  <div class="col-sm-3">
+                      {% if name == "gender" %}
+                        <select class="form-control" id="{{ field.id_for_label }}" maxlength="1" name="{{ name }}">
+                          <option value="М">Мужской</option>
+                          <option value="Ж">Женский</option>
+                        </select>
+                      {% elif name == "photo" %}
+                        <input type="file" class="form-control" id="{{ field.id_for_label }}" name="{{ name }}"/>
+                      {% elif name == "date_of_birth" %}
+                        <input type="text" class="form-control" id="{{ field.id_for_label }}" name="{{ name }}" value="{{ field.value|date:'d.m.Y' }}"/>
+                      {% else %}
+                        <input type="text" class="form-control" id="{{ field.id_for_label }}" name="{{ name }}" value="{{ field.value }}"/>
+                      {% endif %}
+                      {% for error in field.errors %}
+                        <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>
+                {% endwith %}
+              </div>
+            </div>
+        {% endfor %}
+        {% csrf_token %}
+        <a class="btn btn-danger" href="{% url 'user:user_page' request.session.user_id %}" role="button">
+          &emsp;Назад&emsp;
+        </a>
+        &emsp;
+        <button type="submit" class="btn btn-default">Сохранить изменения</button>
+
+      </form>
+    </div>
+
+
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+
+
+{% block title %}Выход{% endblock %}
+
+{% block first %}
+    <div id="authorization" class="text-center">
+      <h2><strong>Необходима авторизация</strong></h2>
+      <br>
+      <p>
+        Вам необходимо
+        <a href="{% url 'user:login' %}" class="menu-link">войти в аккаунт</a>
+        или <a href="{% url 'user:register' %}" class="menu-link">зарегистрироваться</a> для того, чтобы добавить понравившееся произведение.
+      </p>
+    </div>
+
+
+
+{% endblock %}

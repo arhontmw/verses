@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ verse.title }}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-3">
+      <div id="sidebar">
+        <h3><strong>
+          <a href="{% url 'author:author_detail' author.id author.slug %}" class="author-link">
+            {{ author.first_name|first }}. {{ author.surname }}
+          </a></strong>
+        </h3>
+        <ul class = "nav nav-pills nav-stacked">
+          {% for v in author.verses.all %}
+            <li role="presentation" {% if v.id == verse.id %}class="active"{% endif %}>
+              <a href="{{ v.get_absolute_url_detail }}">
+                {{ v.title }}{% if v.year_of_writing %} ({{ v.year_of_writing }}){% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div><!-- end sidebar -->
+    </div><!-- End col-md-3-->
+    <div class="col-md-6">
+      <div id="main-verse">
+        <h3 class="title">
+          <a href="#collapseToolbar" id="show-menu" class="btn btn-default btn-sm" style="border-color: #365FB7;" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseToolbar">
+            <span id="menu" class="glyphicon glyphicon-chevron-up"></span>
+          </a>
+          <strong>{{ verse.title }}</strong>&nbsp;
+          <small>{{ verse.year_of_writing }}</small>
+        </h3>
+        <div class="collapse in" id="collapseToolbar">
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group" role="group">
+              <a href = "#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#verseModal">
+                <span class="glyphicon glyphicon-book" aria-hidden="true"></span>&emsp;Читать
+              </a>
+            </div>
+            {% if request.user.is_authenticated %}
+              <div class="btn-group" role="group">
+                <a href = "#' verse.id verse.slug %}" class="btn btn-default btn-sm" data-toggle="modal" data-target="#emailModal">
+                  <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>&emsp;Отправить на почту
+                </a>
+              </div>
+              <div class="btn-group" role="group">
+                <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#commentModal">
+                  <span class="glyphicon glyphicon-comment"></span>&emsp;Добавить комментарий
+                </a>
+              </div>
+              <div class="btn-group" role="group" id="like-div">
+                <form action="." method="post">
+                  {% with verse.users_like.count as total_likes %}
+                    <a href="#" class='btn btn-default btn-sm {% if request.user in verse.users_like.all %}un{% endif %}like-button' id="like-a"
+                     data-action="{% if request.user in verse.users_like.all %}un{% endif %}like">
+                      <span class="glyphicon glyphicon-heart"></span>&emsp;<span id="counter">{{ total_likes }}</span>
+                    </a>
+                  {% endwith %}
+                  {% csrf_token %}
+                </form>
+              </div>
+            {% else %}
+              {% with verse.users_like.count as total_likes %}
+                <a href='{% url "user:need_login" %}' class='btn btn-default btn-sm'>
+                  <span class="glyphicon glyphicon-heart"></span>&emsp;<span id="counter">{{ total_likes }}</span>
+                </a>
+              {% endwith %}
+            {% endif %}
+          </div><!--end toolbar-->
+        </div><!--end collapseToolbar-->
+        <div class="content">
+          <p>
+            <div class="modal fade" id="verseModal" tabindex="-1" role="dialog" aria-labelledby="verseModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button><br>
+                    <h4 class="modal-title text-center text-uppercase" id="verseModalLabel"><strong>{{ verse.title }}</strong><br><small>{{ verse.year_of_writing }}</small></h4>
+                  </div><!--end modal-header-->
+                  <div class="modal-body text-center">
+                    {{ verse.text|linebreaks }}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                  </div>
+                </div><!--end modal-content-->
+              </div>
+            </div><!-- end verseModalLabel-->
+            <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button><br>
+                    <h4 class="modal-title text-center text-uppercase" id="emailModalLabel"><strong>{{ verse.title }}</strong><br><small>{{ verse.year_of_writing }}</small></h4>
+                  </div><!--end modal-header-->
+                  <form action="." method="post">
+                    {% csrf_token %}
+                    <div class="modal-body text-center">
+                      Данное произведение будет отправлено на Ваш Email <strong>{{ request.session.user_email }}</strong>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-dismiss="modal">Отмена</button>
+                      &emsp;
+                      <a href = "{% url 'verse:send_verse_by_email' verse.id verse.slug %}" id="send_email" class="btn btn-default" data-dismiss="modal">Отправить</a>
+                    </div>
+                  </form>
+                </div><!--end modal-content-->
+              </div>
+            </div><!-- end emailModalLabel-->
+            {{ verse.text|linebreaks }}
+          </p>
+        </div><!-- end content-->
+      </div><!-- end #main-verse-->
+    </div><!--end col-md-6-->
+    <div class="col-md-3">
+      <div id="comments">
+        <h3 class="title">
+          <a href="#collapseComments" id="show-comments" class="btn btn-default btn-sm" style="border-color: #365FB7;" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseComments">
+            <span id="comment" class="glyphicon glyphicon-chevron-up"></span>
+          </a>
+          <strong>Комментарии</strong>
+        </h3>
+        <div class="collapse in" id="collapseComments">
+          {% for comment in comments %}
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <strong>{{ comment.user.username }}</strong>
+                // {{ comment.update_date|date:"d.m.Y h:m:s" }}
+              </div>
+              <div class="panel-body">
+                {{ comment.text|linebreaks }}
+              </div>
+            </div>
+          {% empty %}
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <strong>Нет комментариев</strong>
+              </div>
+              <div class="panel-body">
+                0 комментариев
+              </div>
+            </div>
+          {% endfor %}
+        </div><!-- end collapseComments-->
+
+        <!-- comment modal form-->
+        <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button><br>
+                <h4 class="modal-title" id="commentModalLabel">
+                  <strong>{{ verse.title }}</strong>&emsp;<small>{{ verse.year_of_writing }}</small>
+                </h4>
+              </div><!--end modal-header-->
+              <form action="." method="post" id="postComment">
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label for="comment-area" class="control-label">Комментарий:</label>
+                    <textarea class="form-control text-comment" id="id-comment-area" name="comment-area" maxlength="140"/></textarea>
+                    {% csrf_token %}
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Закрыть</button>
+                  &emsp;
+                  <button type="submit" class="btn btn-default">Добавить комментарий</button>
+                </div>
+              </form>
+            </div><!--end modal-content-->
+          </div>
+        </div><!-- end commentModalLabel-->
+      </div>
+    </div>
+  </div><!--End row-->
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $(document).on('submit', "#postComment", function(e){
+        if ($('.text-comment').val()) {
+          e.preventDefault();
+          $.ajax({
+            type: "POST",
+            url: "/verses/{{ verse.id }}/{{ verse.slug }}/add-comment/",
+            data: {
+              text: $('.text-comment').val(),
+              csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function(response){
+              console.log(response["status"]);
+              location.reload();
+            }
+          });
+        } else {
+          alert("Комментарий не может быть пустым");
+        }
+      });
+
+      $(document).on('click', "a#send_email", function(e){
+        e.preventDefault();
+        $.ajax({
+          type: 'POST',
+          url: '/verses/{{ verse.id }}/{{ verse.slug }}/send-email/',
+          data: {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+          },
+          success: function(response) {
+            console.log(response["status"]);
+            location.reload()
+            // alert("Сообщение отправлено!");
+          }
+        });
+      });
+
+      $(document).on('click', "a#like-a", function(e){
+        e.preventDefault();
+        $.ajax({
+          type: 'POST',
+          url: '/verses/{{ verse.id }}/{{ verse.slug }}/like/',
+          data: {
+            action: $(this).data('action'),
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+          },
+          cache: false,
+          async: true,
+          success: function(response) {
+            if (response["status"] == 'ok')
+            {
+              var previous_action = $('a#like-a').data('action');
+              //toggle data-action
+              $('a#like-a').data('action', previous_action == 'like' ? 'unlike' : 'like');
+              // update total likes
+              var previous_likes = parseInt($('a#like-a span.counter').text());
+              $('a#like-a span.counter').text(previous_action == "like" ? previous_likes + 1 : previous_likes - 1);
+              console.log(response['status']);
+              location.reload();
+            }
+            else {
+              alert(response['status']);
+            }
+          }
+        });
+      });
+
+      $('a#show-comments').click(function(){
+        $("span#comment").toggleClass("glyphicon glyphicon-chevron-up comment");
+        $("span#comment").toggleClass("glyphicon glyphicon-chevron-down comment");
+      });
+      $('a#show-menu').click(function(){
+        $("span#menu").toggleClass("glyphicon glyphicon-chevron-up comment");
+        $("span#menu").toggleClass("glyphicon glyphicon-chevron-down comment");
+      });
+    });
+  </script>
+{% endblock %}

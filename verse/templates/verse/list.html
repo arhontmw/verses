@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if author %}{{ author.surname }}{% else %}Поэты{% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-3">
+      <div id="sidebar">
+        <div class="page-header">
+          <h3><strong>Авторы</strong></h3>
+        </div>
+        <ul class = "nav nav-pills nav-stacked">
+          <li role="presentation" {% if not author %}class="active"{% endif %}>
+            <a href="{% url 'verse:verse_list' %}">Все авторы</a>
+          </li>
+          {% for a in authors %}
+            <li role="presentation" {% if author.slug == a.slug %}class="active"{% endif %}>
+              <a href="{{ a.get_absolute_url_list }}">
+                {% with a.verses.count as num_verses %}
+                  {{ a.surname }} <span class="badge">{{ num_verses }}</span>
+                {% endwith %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div><!-- end sidebar -->
+    </div><!-- End col-md-3-->
+    <div class="col-md-6">
+      <div id="main-verses">
+        <div class="page-header">
+          <h3><strong>{% if author %}<a href="{% url 'author:author_detail' author.id author.slug %}" class="author-link">{{ author }}</a>
+            {% else %}Все произведения{% endif %}</strong></h3>
+        </div>
+        {% if not author %}
+          {% for a in authors %}
+            <h4><strong><a href="{% url 'author:author_detail' a.id a.slug %}" class="author-link">{{ a }}</a></strong></h4>
+            <ul>
+              {% for v in a.verses.all %}
+                <li>
+                  <a href="{% url 'verse:verse_detail' v.id v.slug %}" class="verse-link">
+                    {{ v.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+            <br>
+          {% endfor %}
+        {% else %}
+          <ul>
+            {% for v in verses %}
+              <li><a href="{% url 'verse:verse_detail' v.id v.slug %}" class="verse-link">{{ v.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div><!-- end #main-verses-->
+    </div><!--end col-md-6-->
+  </div><!--End row-->
+
+
+
+{% endblock %}

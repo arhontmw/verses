@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}{{ profile.user.username }}{% endblock %}
+
+{% block content %}
+  <div id="user-page">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2>
+          <strong>Моя страница</strong>
+        </h2>
+        <strong><a href="{% url 'user:edit_user_page' profile.user.id %}" class='edit-link'>редактировать <span class="glyphicon glyphicon-edit"></span></a></strong>
+
+      </div><!-- end col-md-12-->
+    </div><!-- end row-->
+    <div class="row">
+      <div class="col-md-3">
+        {% load thumbnail %}
+        {% thumbnail profile.photo "200x200" crop="center" as im %}
+          <a href="{{ profile.photo.url }}">
+            <img src="{% if im %}{{ im.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" alt="Фото пользователя" class="img-thumbnail"/>
+          </a>
+        {% endthumbnail %}
+      </div><!--End col-md-3 -->
+      <div class="col-md-4">
+        <p>
+          <strong class="text-uppercase">Имя: </strong>{{ profile.user.first_name }}
+        </p>
+        <p>
+          <strong class="text-uppercase">Фамилия: </strong>{{ profile.user.last_name }}
+        </p>
+        <p>
+          <strong class="text-uppercase">Логин: </strong>{{ profile.user.username }}
+        </p>
+        <p>
+          <strong class="text-uppercase">Email: </strong>{{ profile.user.email }}
+        </p>
+        <p>
+          <strong class="text-uppercase">Дата рождения: </strong>{{ profile.date_of_birth|date:"d.m.Y" }}
+        </p>
+        <p>
+          <strong class="text-uppercase">Пол: </strong>{{ profile.get_gender_display }}
+        </p>
+      </div>
+    </div><!--End row-->
+    <div class="row">
+      <div class="col-md-12" id="verses_liked">
+        <h3 class="text-center" style="color: #133463;">Понравившиеся произведения</h3>
+        <ul>
+          {% for verse_liked in request.user.verses_liked.all %}
+            <li><a href="{% url 'verse:verse_detail' verse_liked.id verse_liked.slug %}" class="verse-link" style="color: #133463;">{{ verse_liked }}</a></li>
+          {% empty %}
+            <li>Нет понравившихся произведений</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+  </div><!-- end user-page-->
+{% endblock %}

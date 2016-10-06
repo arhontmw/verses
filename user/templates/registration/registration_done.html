@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+
+{% block title %}Регистрация завершена{% endblock %}
+
+<!-- write jquery listener on field status -->
+
+{% block first %}
+    <div id="registration" class="text-center">
+      <h2><strong>Регистрация успешно завершена!</strong></h2>
+      <br>
+      <p>
+        Теперь Вы можете <a href="{% url 'user:login' %}">войти в систему</a>
+      </p>
+    </div>
+
+
+
+{% endblock %}

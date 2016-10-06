@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ author.surname }}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-3">
+      <div id="sidebar">
+        <div class="page-header">
+          <h3><strong>Поэты</a></strong></h3>
+        </div>
+        <ul class = "nav nav-pills nav-stacked">
+          {% for a in authors %}
+            <li role="presentation" {% if a.id == author.id %}class="active"{% endif %}>
+              <a href="{% url 'author:author_detail' a.id a.slug %}">{{ a }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div><!-- end sidebar -->
+    </div><!-- End col-md-3-->
+    <div class="col-md-6">
+      <div id="main-author">
+        <div class="page-header">
+          <h3><strong>
+            {{ author.first_name }} {{ author.last_name }} {{ author.surname }}
+          </strong> <small>({{author.date_of_birth.year}}-{{author.date_of_death.year}})</small></h3>
+        </div>
+        <h5 style="margin-bottom: 3%;"><a href="{% url 'verse:verse_list_by_author' author.slug %}" class="verse-link">Перейти к произведениям поэта</a></h5>
+        <div class="content text-justify">
+            {{ author.biography|linebreaks }}
+        </div>
+      </div><!-- end #main-verses-->
+    </div><!--end col-md-6-->
+    <div class="col-md-3">
+      {% load thumbnail %}
+      {% thumbnail author.photo "300" crop="center" as im %}
+        <a href="{{ author.photo.url }}">
+          <img src="{% if im %}{{ im.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" alt="photo" class="img-thumbnail"/>
+        </a>
+      {% endthumbnail %}
+    </div>
+  </div><!--End row-->
+
+
+
+{% endblock %}
